@@ -1,0 +1,26 @@
+{
+    "name": "alexeevdv/yii2-recaptcha-widget",
+    "description": "Google reCAPTCHA widget for Yii2",
+    "keywords": ["yii2", "captcha", "recaptcha", "google", "widget"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "support": {
+        "source": "https://github.com/alexeevdv/yii2-recaptcha-widget",
+        "issues": "https://github.com/alexeevdv/yii2-recaptcha-widget/issues",
+    }
+    "authors": [
+        {
+            "name": "alexeevdv",
+            "homepage": "https://alexeevdv.ru/",
+            "email": "mail@alexeevdv.ru"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "alexeevdv\\recaptcha\\": ""
+        }
+    }
+}
