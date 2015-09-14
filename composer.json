@@ -15,6 +15,7 @@
             "email": "mail@alexeevdv.ru"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*"
     },
