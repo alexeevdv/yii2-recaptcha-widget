@@ -7,7 +7,7 @@
     "support": {
         "source": "https://github.com/alexeevdv/yii2-recaptcha-widget",
         "issues": "https://github.com/alexeevdv/yii2-recaptcha-widget/issues"
-    }
+    },
     "authors": [
         {
             "name": "alexeevdv",
