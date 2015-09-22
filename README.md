@@ -37,7 +37,6 @@ to the ```require``` section of your `composer.json` file.
 ```
 ### Through widget and validator params
 ```php
-
 // Model validation rules
 public function rules() {
     return [
@@ -56,7 +55,6 @@ echo \alexeevdv\recaptcha\Validator::widget([
 ## Usage
 
 ```php
-
 // Using ActiveForm
 echo $form->field($model, 'recaptcha')->widget(\alexeevdv\recaptcha\InputWidget::className());
 
