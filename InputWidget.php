@@ -2,9 +2,13 @@
 
 namespace alexeevdv\recaptcha;
 
-use \yii\helpers\Html;
+use Yii;
+use yii\base\InvalidConfigException;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
-class InputWidget extends \yii\widgets\InputWidget {
+class InputWidget extends \yii\widgets\InputWidget
+{
     
     /**
      * HTML input name
@@ -30,25 +34,26 @@ class InputWidget extends \yii\widgets\InputWidget {
      */
     public $options = [];
 
-    const JS_API = "https://www.google.com/recaptcha/api.js";
+    const JS_API_FILE = "https://www.google.com/recaptcha/api.js";
     
-    public function run() {
-        
-        if(empty($this->siteKey)) {
-            if (!\yii::$app->has("recaptcha") || empty(\yii::$app->recaptcha->siteKey)) {
-                throw new \yii\base\InvalidConfigException("`siteKey` param is required");
+    public function run()
+    {
+        if(empty($this->siteKey))
+        {
+            if (!Yii::$app->has("recaptcha") || !strlen(Yii::$app->recaptcha->siteKey))
+            {
+                throw new InvalidConfigException("`siteKey` param is required");
             }
-            $this->siteKey = \yii::$app->recaptcha->siteKey;
+            $this->siteKey = Yii::$app->recaptcha->siteKey;
         }
 
-        $this->view->registerJsFile(self::JS_API);
+        $this->view->registerJsFile(self::JS_API_FILE);
         
-        $options = \yii\helpers\ArrayHelper::merge([
-            "class" => "g-recapthca",
+        $options = ArrayHelper::merge([
+            "class" => "g-recaptcha",
             "data-sitekey" => $this->siteKey,
         ], $this->options);
 
         return Html::tag("div", "", $options);
     }
-
 }
