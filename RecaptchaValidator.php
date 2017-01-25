@@ -7,9 +7,11 @@ use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\helpers\Json;
 
-class Validator extends \yii\validators\Validator
+class RecaptchaValidator extends \yii\validators\Validator
 {    
     public $skipOnEmpty = false;
+
+    public $component = 'recaptcha';
 
     /**
      * Secret key
@@ -23,11 +25,11 @@ class Validator extends \yii\validators\Validator
 
         if (empty($this->secret))
         {
-            if (!Yii::$app->has("recaptcha") || !strlen(Yii::$app->recaptcha->secret))
+            if (!Yii::$app->has($this->component) || !strlen(Yii::$app->{$this->component}->secret))
             {
                 throw new InvalidConfigException("`secret` param is required");
             }
-            $this->secret = Yii::$app->recaptcha->secret;
+            $this->secret = Yii::$app->{$this->component}->secret;
         }
 
         if ($this->message === null)

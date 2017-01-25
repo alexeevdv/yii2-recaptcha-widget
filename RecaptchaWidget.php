@@ -7,14 +7,13 @@ use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
-class InputWidget extends \yii\widgets\InputWidget
+class RecaptchaWidget extends \yii\widgets\InputWidget
 {
-    
     /**
-     * HTML input name
+     * Recaptcha component name
      * @var string
      */
-    public $name = "recaptcha";
+    public $component = "recaptcha";
 
     /**
      * Site key
@@ -22,12 +21,6 @@ class InputWidget extends \yii\widgets\InputWidget
      */
     public $siteKey;
 
-    /**
-     * Secret key
-     * @var string
-     */
-    public $secret;
-    
     /**
      * Html attributes
      * @var array
@@ -37,14 +30,14 @@ class InputWidget extends \yii\widgets\InputWidget
     const JS_API_FILE = "https://www.google.com/recaptcha/api.js";
     
     public function run()
-    {
+    {        
         if(empty($this->siteKey))
         {
-            if (!Yii::$app->has("recaptcha") || !strlen(Yii::$app->recaptcha->siteKey))
+            if (!Yii::$app->has($this->component) || !strlen(Yii::$app->{$this->component}->siteKey))
             {
                 throw new InvalidConfigException("`siteKey` param is required");
             }
-            $this->siteKey = Yii::$app->recaptcha->siteKey;
+            $this->siteKey = Yii::$app->{$this->component}->siteKey;
         }
 
         $this->view->registerJsFile(self::JS_API_FILE);
