@@ -11,7 +11,7 @@ class RecaptchaValidator extends \yii\validators\Validator
 {    
     public $skipOnEmpty = false;
 
-    public $component = 'recaptcha';
+    public $componentId = 'recaptcha';
 
     /**
      * Secret key
@@ -23,18 +23,18 @@ class RecaptchaValidator extends \yii\validators\Validator
     {
         parent::init();
 
-        if (empty($this->secret))
+        if ($this->secret === null)
         {
-            if (!Yii::$app->has($this->component) || !strlen(Yii::$app->{$this->component}->secret))
+            if ($this->component === null || $this->component->secret === null)
             {
-                throw new InvalidConfigException("`secret` param is required");
+                throw new InvalidConfigException(Yii::t('recaptcha', '"secret" param is required.'));
             }
-            $this->secret = Yii::$app->{$this->component}->secret;
+            $this->secret = $this->component->secret;
         }
 
         if ($this->message === null)
         {
-            $this->message = Yii::t("yii", "The verification code is incorrect.");
+            $this->message = Yii::t('recaptcha', 'The verification code is incorrect.');
         }
     }
 
@@ -42,7 +42,15 @@ class RecaptchaValidator extends \yii\validators\Validator
     {
         if (empty($value))
         {
-            $value = Yii::$app->request->post("g-recaptcha-response");
+            if (Yii::$app->request->isPost)
+            {
+                $value = Yii::$app->request->post("g-recaptcha-response");
+            }
+            else
+            {
+                $value = Yii::$app->request->get("g-recaptcha-response");
+            }
+
             if (!$value)
             {
                 return [$this->message, []];
@@ -59,9 +67,18 @@ class RecaptchaValidator extends \yii\validators\Validator
 
         if (!isset($response['success']))
         {
-            throw new Exception('Invalid reCAPTCHA verify response.');
+            throw new Exception('recaptcha', 'Invalid reCAPTCHA verify response.');
         }
 
         return $response['success'] ? null : [$this->message, []];
-    }    
+    }
+
+    public function getComponent()
+    {
+        if (!Yii::$app->has($this->componentId))
+        {
+            return null;
+        }
+        return Yii::$app->{$this->componentId};
+    }
 }
