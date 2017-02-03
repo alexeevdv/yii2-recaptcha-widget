@@ -10,13 +10,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-$ php composer.phar require alexeevdv/yii2-recaptcha-widget "1.0.1"
+$ php composer.phar require alexeevdv/yii2-recaptcha-widget "1.1.0"
 ```
 
 or add
 
 ```
-"alexeevdv/yii2-recaptcha-widget": "1.0.1"
+"alexeevdv/yii2-recaptcha-widget": "1.1.0"
 ```
 
 to the ```require``` section of your `composer.json` file.
@@ -35,6 +35,7 @@ to the ```require``` section of your `composer.json` file.
     //...
 ],
 ```
+
 ### Through widget and validator params
 ```php
 // Model validation rules
@@ -55,10 +56,55 @@ echo \alexeevdv\recaptcha\RecaptchaValidator::widget([
 ## Usage
 
 ```php
+use alexeevdv\recaptcha\RecaptchaWidget;
+
 // Using ActiveForm
-echo $form->field($model, 'recaptcha')->widget(\alexeevdv\recaptcha\RecaptchaWidget::className());
+echo $form->field($model, 'recaptcha')->widget(RecaptchaWidget::className());
 
 // As standalone field
-echo \alexeevdv\recaptcha\RecaptchaWidget::widget();
+echo RecaptchaWidget::widget();
 
+```
+
+## Additional component and widget params
+
+```
+/**
+ * Optional. Color theme of the widget. "dark" or "light"
+ * @var string
+ */
+public $theme;
+
+/**       
+ * Optional. The type of CAPTCHA to serve. "image" or "audio"
+ * @var string
+ */
+public $type;
+
+/**
+ * Optional. The size of the widget. "compact" or "normal"
+ * @var string
+ */
+public $size;
+
+/**
+ * Optional. The tabindex of the widget and challenge.
+ * If other elements in your page use tabindex, it should be set to make user navigation easier.
+ * @var integer
+ */
+public $tabindex;
+
+/**
+ * Optional. The name of your callback function to be executed when the user submits a successful CAPTCHA response.
+ * The user's response, g-recaptcha-response, will be the input for your callback function.
+ * @var string
+ */
+public $callback;
+
+/**
+ * Optional. The name of your callback function to be executed when the recaptcha
+ * response expires and the user needs to solve a new CAPTCHA.
+ * @var string
+ */
+public $expiredCallback;
 ```
