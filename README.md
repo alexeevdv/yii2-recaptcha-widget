@@ -9,7 +9,7 @@ The preferred way to install this extension is through [composer](http://getcomp
 
 Either run
 
-```
+```bash
 $ php composer.phar require alexeevdv/yii2-recaptcha-widget "1.1.0"
 ```
 
@@ -68,7 +68,7 @@ echo RecaptchaWidget::widget();
 
 ## Additional component and widget params
 
-```
+```php
 /**
  * Optional. Color theme of the widget. "dark" or "light"
  * @var string
