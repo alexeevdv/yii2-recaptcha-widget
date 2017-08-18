@@ -3,15 +3,20 @@
 namespace alexeevdv\recaptcha;
 
 use Yii;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\i18n\PhpMessageSource;
 
-class Recaptcha extends \yii\base\Component
+/**
+ * Class Recaptcha
+ * @package alexeevdv\recaptcha
+ */
+class Recaptcha extends Component
 {
     /**
      * Site key
-     * @var string 
+     * @var string
      */
     public $siteKey;
 
@@ -20,14 +25,14 @@ class Recaptcha extends \yii\base\Component
      * @var string
      */
     public $secret;
-    
+
     /**
      * Optional. Color theme of the widget
      * @var string
      */
     public $theme;
 
-    /**       
+    /**
      * Optional. The type of CAPTCHA to serve
      * @var string
      */
@@ -59,15 +64,17 @@ class Recaptcha extends \yii\base\Component
      * @var string
      */
     public $expiredCallback;
-    
+
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
     public function init()
     {
-        parent::init();
-       
         // Initialize translations
         Yii::$app->i18n->translations['recaptcha*'] = [
-            'class' => PhpMessageSource::className(),
-            'basePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'messages',
+            'class' => PhpMessageSource::class,
+            'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'messages',
             'sourceLanguage' => 'en',
             'forceTranslation' => true,
             'fileMap' => [
@@ -81,19 +88,21 @@ class Recaptcha extends \yii\base\Component
                 'value' => $this->theme,
             ]));
         }
-        
+
         if ($this->type !== null && !in_array($this->type, ['image', 'audio']))
         {
             throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong type value "{value}". Only "image" and "audio" are allowed.', [
                 'value' => $this->type,
             ]));
         }
-        
+
         if ($this->size !== null && !in_array($this->size, ['compact', 'normal']))
         {
             throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong size value "{value}". Only "compact" and "normal" are allowed.', [
                 'value' => $this->size,
             ]));
         }
+
+        parent::init();
     }
 }
