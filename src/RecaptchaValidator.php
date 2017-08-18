@@ -58,9 +58,9 @@ class RecaptchaValidator extends Validator
     {
         if (empty($value)) {
             if (Yii::$app->request->isPost) {
-                $value = Yii::$app->request->post("g-recaptcha-response");
+                $value = Yii::$app->request->post('g-recaptcha-response');
             } else {
-                $value = Yii::$app->request->get("g-recaptcha-response");
+                $value = Yii::$app->request->get('g-recaptcha-response');
             }
 
             if (!$value) {
@@ -68,10 +68,10 @@ class RecaptchaValidator extends Validator
             }
         }
 
-        $request = "https://www.google.com/recaptcha/api/siteverify?" . http_build_query([
-            "secret" => $this->secret,
-            "response" => $value,
-            "remoteip" => Yii::$app->request->userIP,
+        $request = 'https://www.google.com/recaptcha/api/siteverify?' . http_build_query([
+            'secret' => $this->secret,
+            'response' => $value,
+            'remoteip' => Yii::$app->request->userIP,
         ]);
 
         // TODO: use yii2-httpclient

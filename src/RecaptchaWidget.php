@@ -86,7 +86,7 @@ class RecaptchaWidget extends InputWidget
      */
     public function init()
     {
-        if($this->siteKey === null ) {
+        if ($this->siteKey === null) {
             if ($this->component === null || $this->component->siteKey === null) {
                 throw new InvalidConfigException(Yii::t('recaptcha', '"siteKey" param is required.'));
             }
@@ -156,13 +156,13 @@ class RecaptchaWidget extends InputWidget
         ]);
 
         $options = [
-            "class" => "g-recaptcha",
-            "data-sitekey" => $this->getParam('siteKey'),
+            'class' => 'g-recaptcha',
+            'data-sitekey' => $this->getParam('siteKey'),
         ];
 
-        foreach(['theme', 'type', 'size', 'tabindex', 'callback'] as $param) {
+        foreach (['theme', 'type', 'size', 'tabindex', 'callback'] as $param) {
             if ($this->getParam($param) !== null) {
-                $options['data-'.$param] = $this->getParam($param);
+                $options['data-' . $param] = $this->getParam($param);
             }
         }
 
@@ -172,7 +172,7 @@ class RecaptchaWidget extends InputWidget
 
         $options = ArrayHelper::merge($options, $this->options);
 
-        return Html::tag("div", "", $options);
+        return Html::tag('div', '', $options);
     }
 
     /**
