@@ -66,7 +66,7 @@ class RecaptchaWidget extends \yii\widgets\InputWidget
      */
     public $options = [];
 
-    const JS_API_FILE = 'https://www.google.com/recaptcha/api.js';
+    const JS_API_URL = 'https://www.google.com/recaptcha/api.js';
     
     public function init()
     {
@@ -101,10 +101,33 @@ class RecaptchaWidget extends \yii\widgets\InputWidget
             ]));
         }
     }
+    
+    protected function getLanguageSuffix()
+    {
+        $currentAppLanguage = Yii::$app->language;
+        $langsExceptions = ['zh-CN', 'zh-TW', 'zh-TW'];
+        if (strpos($currentAppLanguage, '-') === false) {
+            return $currentAppLanguage;
+        }
+        if (in_array($currentAppLanguage, $langsExceptions)) {
+            return $currentAppLanguage;
+        } else {
+            return substr($currentAppLanguage, 0, strpos($currentAppLanguage, '-'));
+        }
+    }
 
     public function run()
     {        
-        $this->view->registerJsFile(self::JS_API_FILE);
+        $this->view->registerJsFile(self::JS_API_URL);
+        
+        $this->view->registerJsFile(
+            self::JS_API_URL . '?hl=' . $this->getLanguageSuffix(),
+            [
+                'position' => $this->view::POS_HEAD,
+                'async' => true,
+                'defer' => true
+            ]
+        );
 
         $options = [
             "class" => "g-recaptcha",
