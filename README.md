@@ -10,13 +10,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```bash
-$ php composer.phar require alexeevdv/yii2-recaptcha-widget "1.1.0"
+$ php composer.phar require alexeevdv/yii2-recaptcha-widget "~1.0"
 ```
 
 or add
 
 ```
-"alexeevdv/yii2-recaptcha-widget": "1.1.0"
+"alexeevdv/yii2-recaptcha-widget": "~1.0"
 ```
 
 to the ```require``` section of your `composer.json` file.
@@ -38,17 +38,20 @@ to the ```require``` section of your `composer.json` file.
 
 ### Through widget and validator params
 ```php
+use alexeevdv\recaptcha\RecaptchaValidator;
+use alexeevdv\recaptcha\RecaptchaWidget;
+
 // Model validation rules
 public function rules() {
     return [
         //...
-        ["recaptcha", \alexeevdv\recaptcha\RecaptchaWidget::className(), "secret" => "YOUR_SECRET"],
+        ["recaptcha", RecaptchaValidator::class, "secret" => "YOUR_SECRET"],
         //...
     ];
 }
 
 // Widget params
-echo \alexeevdv\recaptcha\RecaptchaValidator::widget([
+echo RecaptchaWidget::widget([
     "siteKey" => "YOUR_SITE_KEY",
 ]);
 ```
@@ -59,7 +62,7 @@ echo \alexeevdv\recaptcha\RecaptchaValidator::widget([
 use alexeevdv\recaptcha\RecaptchaWidget;
 
 // Using ActiveForm
-echo $form->field($model, 'recaptcha')->widget(RecaptchaWidget::className());
+echo $form->field($model, 'recaptcha')->widget(RecaptchaWidget::class);
 
 // As standalone field
 echo RecaptchaWidget::widget();
@@ -107,4 +110,12 @@ public $callback;
  * @var string
  */
 public $expiredCallback;
+
+/**
+ * Optional. Forces the widget to render in a specific language
+ * If not set then language is auto detected from application language
+ * If set to false then language is autodetected on client side
+ */
+public $language;
+
 ```

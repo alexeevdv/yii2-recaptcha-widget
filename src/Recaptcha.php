@@ -82,22 +82,19 @@ class Recaptcha extends Component
             ],
         ];
 
-        if ($this->theme !== null && !in_array($this->theme, ['dark', 'light']))
-        {
+        if ($this->theme !== null && !in_array($this->theme, ['dark', 'light'])) {
             throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong theme value "{value}". Only "dark" and "light" are allowed.', [
                 'value' => $this->theme,
             ]));
         }
 
-        if ($this->type !== null && !in_array($this->type, ['image', 'audio']))
-        {
+        if ($this->type !== null && !in_array($this->type, ['image', 'audio'])) {
             throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong type value "{value}". Only "image" and "audio" are allowed.', [
                 'value' => $this->type,
             ]));
         }
 
-        if ($this->size !== null && !in_array($this->size, ['compact', 'normal']))
-        {
+        if ($this->size !== null && !in_array($this->size, ['compact', 'normal'])) {
             throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong size value "{value}". Only "compact" and "normal" are allowed.', [
                 'value' => $this->size,
             ]));
