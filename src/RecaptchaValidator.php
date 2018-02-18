@@ -5,6 +5,7 @@ namespace alexeevdv\recaptcha;
 use Yii;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
+use yii\di\Instance;
 use yii\helpers\Json;
 use yii\validators\Validator;
 
@@ -20,10 +21,10 @@ class RecaptchaValidator extends Validator
     public $skipOnEmpty = false;
 
     /**
-     * Recaptcha component ID
-     * @var string
+     * Recaptcha component
+     * @var string|array|Recaptcha
      */
-    public $componentId = 'recaptcha';
+    public $component = 'recaptcha';
 
     /**
      * Secret key
@@ -38,10 +39,11 @@ class RecaptchaValidator extends Validator
     public function init()
     {
         if ($this->secret === null) {
-            if ($this->component === null || $this->component->secret === null) {
+            $component = Instance::ensure($this->component, Recaptcha::class);
+            if ($component->secret === null) {
                 throw new InvalidConfigException(Yii::t('recaptcha', '"secret" param is required.'));
             }
-            $this->secret = $this->component->secret;
+            $this->secret = $component->secret;
         }
 
         if ($this->message === null) {
@@ -82,16 +84,5 @@ class RecaptchaValidator extends Validator
         }
 
         return [$this->message, []];
-    }
-
-    /**
-     * @return Recaptcha|null
-     */
-    public function getComponent()
-    {
-        if (Yii::$app->has($this->componentId)) {
-            return Yii::$app->{$this->componentId};
-        }
-        return null;
     }
 }

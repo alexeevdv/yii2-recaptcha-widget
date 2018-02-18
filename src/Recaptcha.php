@@ -5,7 +5,7 @@ namespace alexeevdv\recaptcha;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\helpers\ArrayHelper;
+use yii\di\Instance;
 use yii\i18n\PhpMessageSource;
 
 /**
@@ -66,21 +66,18 @@ class Recaptcha extends Component
     public $expiredCallback;
 
     /**
+     * I18n component
+     * @var string|\yii\i18n\I18N|array
+     */
+    public $i18n = 'i18n';
+
+    /**
      * @inheritdoc
      * @throws InvalidConfigException
      */
     public function init()
     {
-        // Initialize translations
-        Yii::$app->i18n->translations['recaptcha*'] = [
-            'class' => PhpMessageSource::class,
-            'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'messages',
-            'sourceLanguage' => 'en',
-            'forceTranslation' => true,
-            'fileMap' => [
-                'recaptcha' => 'recaptcha.php',
-            ],
-        ];
+        $this->initTranslations();
 
         if ($this->theme !== null && !in_array($this->theme, ['dark', 'light'])) {
             throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong theme value "{value}". Only "dark" and "light" are allowed.', [
@@ -101,5 +98,22 @@ class Recaptcha extends Component
         }
 
         parent::init();
+    }
+
+    /**
+     * Initializes translations for component
+     */
+    protected function initTranslations()
+    {
+        /** @var \yii\i18n\I18N $i18n */
+        $i18n = Instance::ensure($this->i18n, \yii\i18n\I18N::class);
+        $i18n->translations['recaptcha*'] = [
+            'class' => PhpMessageSource::class,
+            'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'messages',
+            'sourceLanguage' => 'en',
+            'fileMap' => [
+                'recaptcha' => 'recaptcha.php',
+            ],
+        ];
     }
 }

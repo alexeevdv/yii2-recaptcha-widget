@@ -4,6 +4,7 @@ namespace alexeevdv\recaptcha;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\View;
@@ -15,7 +16,10 @@ use yii\widgets\InputWidget;
  */
 class RecaptchaWidget extends InputWidget
 {
-    const JS_API_URL = 'https://www.google.com/recaptcha/api.js';
+    /**
+     * @var string
+     */
+    public $apiJs = 'https://www.google.com/recaptcha/api.js';
 
     /**
      * Site key
@@ -63,10 +67,10 @@ class RecaptchaWidget extends InputWidget
     public $expiredCallback;
 
     /**
-     * Recaptcha component name
-     * @var string
+     * Recaptcha component
+     * @var string|array|Recaptcha
      */
-    public $componentId = 'recaptcha';
+    public $component = 'recaptcha';
 
     /**
      * Html attributes
@@ -86,16 +90,41 @@ class RecaptchaWidget extends InputWidget
      */
     public function init()
     {
-        if ($this->siteKey === null) {
-            if ($this->component === null || $this->component->siteKey === null) {
-                throw new InvalidConfigException(Yii::t('recaptcha', '"siteKey" param is required.'));
-            }
+        try {
+            $component = Instance::ensure($this->component, Recaptcha::class);
+            Yii::configure($this, ArrayHelper::merge(
+                array_filter([
+                    'siteKey' => $component->siteKey,
+                    'theme' => $component->theme,
+                    'type' => $component->type,
+                    'size' => $component->size,
+                    'tabindex' => $component->tabindex,
+                    'callback' => $component->callback,
+                    'expiredCallback' => $component->expiredCallback,
+                ]),
+                array_filter([
+                    'siteKey' => $this->siteKey,
+                    'theme' => $this->theme,
+                    'type' => $this->type,
+                    'size' => $this->size,
+                    'tabindex' => $this->tabindex,
+                    'callback' => $this->callback,
+                    'expiredCallback' => $this->expiredCallback,
+                ])
+            ));
+        } catch (InvalidConfigException $e) {
         }
 
-        if ($this->theme !== null && !in_array($this->theme, ['dark', 'light'])) {
-            throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong theme value "{value}". Only "dark" and "light" are allowed.', [
-                'value' => $this->theme,
-            ]));
+        if ($this->siteKey === null) {
+            throw new InvalidConfigException(Yii::t('recaptcha', '"siteKey" param is required.'));
+        }
+
+        if ($this->theme !== null) {
+            if (!in_array($this->theme, ['dark', 'light'])) {
+                throw new InvalidConfigException(Yii::t('recaptcha', 'Wrong theme value "{value}". Only "dark" and "light" are allowed.', [
+                    'value' => $this->theme,
+                ]));
+            }
         }
 
         if ($this->type !== null && !in_array($this->type, ['image', 'audio'])) {
@@ -112,7 +141,7 @@ class RecaptchaWidget extends InputWidget
 
         // If language is not set then we trying to guess it from application settings
         if ($this->language === null) {
-            $this->language = $this->getLanguage();
+            $this->language = $this->getApplicationLanguage();
         }
 
         parent::init();
@@ -121,12 +150,12 @@ class RecaptchaWidget extends InputWidget
     /**
      * @return string
      */
-    protected function getLanguage()
+    protected function getApplicationLanguage()
     {
         // According to docs https://developers.google.com/recaptcha/docs/language
         $langsExceptions = ['zh-CN', 'zh-TW', 'zh-TW', 'en-GB', 'fr-CA', 'de-AT', 'de-CH', 'pt-BR', 'pt-PT', 'es-419'];
 
-        $language = Yii::$app->language;
+        $language = ArrayHelper::getValue(Yii::$app, 'language', 'en-US');
         if (strpos($language, '-') === false) {
             return $language;
         }
@@ -143,7 +172,7 @@ class RecaptchaWidget extends InputWidget
      */
     public function run()
     {
-        $url = static::JS_API_URL;
+        $url = $this->apiJs;
 
         if ($this->language !== false) {
             $url .= '?hl=' . $this->language;
@@ -157,47 +186,19 @@ class RecaptchaWidget extends InputWidget
 
         $options = [
             'class' => 'g-recaptcha',
-            'data-sitekey' => $this->getParam('siteKey'),
+            'data-sitekey' => $this->siteKey,
         ];
 
         foreach (['theme', 'type', 'size', 'tabindex', 'callback'] as $param) {
-            if ($this->getParam($param) !== null) {
-                $options['data-' . $param] = $this->getParam($param);
-            }
+            $options['data-' . $param] = $this->$param;
         }
 
-        if ($this->getParam('expiredCallback') !== null) {
-            $options['data-expired-callback'] = $this->getParam('expiredCallback');
+        if ($this->expiredCallback !== null) {
+            $options['data-expired-callback'] = $this->expiredCallback;
         }
 
         $options = ArrayHelper::merge($options, $this->options);
 
         return Html::tag('div', '', $options);
-    }
-
-    /**
-     * @return Recaptcha|null
-     */
-    public function getComponent()
-    {
-        if (Yii::$app->has($this->componentId)) {
-            return Yii::$app->{$this->componentId};
-        }
-        return null;
-    }
-
-    /**
-     * @param string $name
-     * @return mixed|null
-     */
-    public function getParam($name)
-    {
-        if ($this->{$name} !== null) {
-            return $this->{$name};
-        }
-        if ($this->component !== null) {
-            return $this->component->{$name};
-        }
-        return null;
     }
 }
