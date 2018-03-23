@@ -8,6 +8,7 @@ use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\helpers\Json;
 use yii\validators\Validator;
+use yii\web\Request;
 
 /**
  * Class RecaptchaValidator
@@ -58,11 +59,13 @@ class RecaptchaValidator extends Validator
      */
     protected function validateValue($value)
     {
+        /** @var Request $request */
+        $request = Instance::ensure('request', Request::class);
         if (empty($value)) {
-            if (Yii::$app->request->isPost) {
-                $value = Yii::$app->request->post('g-recaptcha-response');
-            } else {
-                $value = Yii::$app->request->get('g-recaptcha-response');
+            if ($request->getIsPost()) {
+                $value = $request->post('g-recaptcha-response');
+            } else if ($request->getIsGet()) {
+                $value = $request->get('g-recaptcha-response');
             }
 
             if (!$value) {
@@ -73,7 +76,7 @@ class RecaptchaValidator extends Validator
         $request = 'https://www.google.com/recaptcha/api/siteverify?' . http_build_query([
             'secret' => $this->secret,
             'response' => $value,
-            'remoteip' => Yii::$app->request->userIP,
+            'remoteip' => $request->getUserIP(),
         ]);
 
         // TODO: use yii2-httpclient

@@ -7,6 +7,7 @@ use alexeevdv\recaptcha\RecaptchaValidator;
 use Codeception\Stub;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\web\Request;
 
 /**
  * Class RecaptchaValidatorTest
@@ -34,6 +35,13 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
                 ],
             ],
         ]);
+        Yii::$container->set('request', function () {
+            return Stub::make(Request::class, [
+                'getUserIP' => '127.0.0.1',
+                'post' => 'random-post-value',
+                'get' => 'random-get-value',
+            ]);
+        });
     }
 
     /**
@@ -43,6 +51,7 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
     {
         Yii::$container->clear('i18n');
         Yii::$container->clear('recaptcha');
+        Yii::$container->clear('request');
     }
 
     /**
@@ -77,5 +86,61 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
             'secret' => 'Hurrdurr',
         ]));
         new RecaptchaValidator;
+    }
+
+    /**
+     * @test
+     */
+    public function validateValue()
+    {
+        $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
+        $this->tester->assertTrue($validator->validate('some-random-code'));
+    }
+
+    /**
+     * @test
+     */
+    public function validateEmptyValuePost()
+    {
+        Yii::$container->set('request', function () {
+            return Stub::make(Request::class, [
+                'getUserIP' => '127.0.0.1',
+                'post' => 'random-post-value',
+                'getIsPost' => true,
+            ]);
+        });
+        $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
+        $this->tester->assertTrue($validator->validate(''));
+    }
+
+    /**
+     * @test
+     */
+    public function validateEmptyValueGet()
+    {
+        Yii::$container->set('request', function () {
+            return Stub::make(Request::class, [
+                'getUserIP' => '127.0.0.1',
+                'get' => 'random-get-value',
+                'getIsGet' => true,
+            ]);
+        });
+        $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
+        $this->tester->assertTrue($validator->validate(''));
+    }
+
+
+    /**
+     * @test
+     */
+    public function validateEmptyValue()
+    {
+        Yii::$container->set('request', function () {
+            return Stub::make(Request::class, [
+                'getUserIP' => '127.0.0.1',
+            ]);
+        });
+        $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
+        $this->tester->assertFalse($validator->validate(''));
     }
 }

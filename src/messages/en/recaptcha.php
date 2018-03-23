@@ -18,5 +18,9 @@
  */
 
 return [
-    'The verification code is incorrect.' => '',
+    'The verification code is incorrect.' => 'The verification code is incorrect.',
+    '"secret" param is required.' => '"secret" param is required.',
+    'Wrong theme value "{value}". Only "dark" and "light" are allowed.' => 'Wrong theme value "{value}". Only "dark" and "light" are allowed.',
+    'Wrong type value "{value}". Only "image" and "audio" are allowed.' => 'Wrong type value "{value}". Only "image" and "audio" are allowed.',
+    'Wrong size value "{value}". Only "compact" and "normal" are allowed.' => 'Wrong size value "{value}". Only "compact" and "normal" are allowed.',
 ];
