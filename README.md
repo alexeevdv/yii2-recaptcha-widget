@@ -18,13 +18,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```bash
-$ php composer.phar require alexeevdv/yii2-recaptcha-widget "~1.0"
+$ php composer.phar require alexeevdv/yii2-recaptcha-widget "~1.1.0"
 ```
 
 or add
 
 ```
-"alexeevdv/yii2-recaptcha-widget": "~1.0"
+"alexeevdv/yii2-recaptcha-widget": "~1.1.0"
 ```
 
 to the ```require``` section of your `composer.json` file.
@@ -33,12 +33,12 @@ to the ```require``` section of your `composer.json` file.
 
 ### Through application component
 ```php
-"components" => [
+'components' => [
     //...
-    "recaptcha" => [
-        "class" => "alexeevdv\recaptcha\Recaptcha",
-        "siteKey" => "YOUR_SITE_KEY",
-        "secret" => "YOUR_SECRET",
+    'recaptcha' => [
+        'class' => \alexeevdv\recaptcha\Recaptcha::class,
+        'siteKey' => 'YOUR_SITE_KEY',
+        'secret' => 'YOUR_SECRET',
     ],
     //...
 ],
@@ -53,14 +53,14 @@ use alexeevdv\recaptcha\RecaptchaWidget;
 public function rules() {
     return [
         //...
-        ["recaptcha", RecaptchaValidator::class, "secret" => "YOUR_SECRET"],
+        ['recaptcha', RecaptchaValidator::class, 'secret' => 'YOUR_SECRET'],
         //...
     ];
 }
 
 // Widget params
 echo RecaptchaWidget::widget([
-    "siteKey" => "YOUR_SITE_KEY",
+    'siteKey' => 'YOUR_SITE_KEY',
 ]);
 ```
 
