@@ -85,6 +85,11 @@ class RecaptchaWidget extends InputWidget
     public $language;
 
     /**
+     * @var string
+     */
+    public $container = 'div';
+
+    /**
      * @inheritdoc
      * @throws InvalidConfigException
      */
@@ -199,6 +204,6 @@ class RecaptchaWidget extends InputWidget
 
         $options = ArrayHelper::merge($options, $this->options);
 
-        return Html::tag('div', '', $options);
+        return Html::tag($this->container, '', $options);
     }
 }

@@ -7,6 +7,10 @@ use alexeevdv\recaptcha\RecaptchaValidator;
 use Codeception\Stub;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\httpclient\Client as HttpClient;
+use yii\httpclient\Exception as HttpClientException;
+use yii\httpclient\Response as HttpClientResponse;
+use yii\web\ErrorHandler;
 use yii\web\Request;
 
 /**
@@ -42,6 +46,13 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
                 'get' => 'random-get-value',
             ]);
         });
+        Yii::$container->set(HttpClientResponse::class, function () {
+            return Stub::make(HttpClientResponse::class, [
+                'getData' => [
+                    'success' => false,
+                ],
+            ]);
+        });
     }
 
     /**
@@ -52,6 +63,9 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
         Yii::$container->clear('i18n');
         Yii::$container->clear('recaptcha');
         Yii::$container->clear('request');
+        Yii::$container->clear(HttpClientResponse::class);
+        Yii::$container->clear(HttpClient::class);
+        Yii::$container->clear('errorHandler');
     }
 
     /**
@@ -91,8 +105,15 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
     /**
      * @test
      */
-    public function validateValue()
+    public function validateValueSuccess()
     {
+        Yii::$container->set(HttpClientResponse::class, function () {
+            return Stub::make(HttpClientResponse::class, [
+                'getData' => [
+                    'success' => true,
+                ],
+            ]);
+        });
         $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
         $this->tester->assertTrue($validator->validate('some-random-code'));
     }
@@ -110,7 +131,7 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
             ]);
         });
         $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
-        $this->tester->assertTrue($validator->validate(''));
+        $this->tester->assertFalse($validator->validate(''));
     }
 
     /**
@@ -126,9 +147,8 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
             ]);
         });
         $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
-        $this->tester->assertTrue($validator->validate(''));
+        $this->tester->assertFalse($validator->validate(''));
     }
-
 
     /**
      * @test
@@ -138,6 +158,55 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
         Yii::$container->set('request', function () {
             return Stub::make(Request::class, [
                 'getUserIP' => '127.0.0.1',
+            ]);
+        });
+        $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
+        $this->tester->assertFalse($validator->validate(''));
+    }
+
+    /**
+     * @test
+     */
+    public function validateGetValueHttpClientException()
+    {
+        Yii::$container->set('request', function () {
+            return Stub::make(Request::class, [
+                'getUserIP' => '127.0.0.1',
+                'get' => 'random-get-value',
+                'getIsGet' => true,
+            ]);
+        });
+        Yii::$container->set(HttpClient::class, function () {
+            return Stub::make(HttpClient::class, [
+                'get' => function () {
+                    throw new HttpClientException;
+                },
+            ]);
+        });
+        $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
+        $this->tester->assertFalse($validator->validate(''));
+    }
+
+    /**
+     * @test
+     */
+    public function validateGetValueHttpClientExceptionErrorHandler()
+    {
+        Yii::$container->set('request', function () {
+            return Stub::make(Request::class, [
+                'getUserIP' => '127.0.0.1',
+                'get' => 'random-get-value',
+                'getIsGet' => true,
+            ]);
+        });
+        Yii::$container->set('errorHandler', function () {
+            return Stub::make(ErrorHandler::class);
+        });
+        Yii::$container->set(HttpClient::class, function () {
+            return Stub::make(HttpClient::class, [
+                'get' => function () {
+                    throw new HttpClientException;
+                },
             ]);
         });
         $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);

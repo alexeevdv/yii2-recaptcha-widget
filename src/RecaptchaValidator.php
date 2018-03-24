@@ -6,8 +6,11 @@ use Yii;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
-use yii\helpers\Json;
+use yii\helpers\ArrayHelper;
+use yii\httpclient\Client as HttpClient;
+use yii\httpclient\Exception as HttpClientException;
 use yii\validators\Validator;
+use yii\web\ErrorHandler;
 use yii\web\Request;
 
 /**
@@ -26,6 +29,14 @@ class RecaptchaValidator extends Validator
      * @var string|array|Recaptcha
      */
     public $component = 'recaptcha';
+
+    /**
+     * @var array|string|HttpClient
+     */
+    public $apiClient = [
+        'class' => HttpClient::class,
+        'baseUrl' => 'https://www.google.com/recaptcha/api',
+    ];
 
     /**
      * Secret key
@@ -64,7 +75,7 @@ class RecaptchaValidator extends Validator
         if (empty($value)) {
             if ($request->getIsPost()) {
                 $value = $request->post('g-recaptcha-response');
-            } else if ($request->getIsGet()) {
+            } elseif ($request->getIsGet()) {
                 $value = $request->get('g-recaptcha-response');
             }
 
@@ -73,18 +84,33 @@ class RecaptchaValidator extends Validator
             }
         }
 
-        $request = 'https://www.google.com/recaptcha/api/siteverify?' . http_build_query([
-            'secret' => $this->secret,
-            'response' => $value,
-            'remoteip' => $request->getUserIP(),
-        ]);
+        /** @var HttpClient $httpClient */
+        $httpClient = Instance::ensure($this->apiClient, HttpClient::class);
+        try {
+            $response = $httpClient
+                ->get('siteverify', [
+                    'secret' => $this->secret,
+                    'response' => $value,
+                    'remoteip' => $request->getUserIP(),
+                ])
+                ->send()
+                ->getData();
+        } catch (HttpClientException $httpException) {
+            try {
+                /** @var ErrorHandler $errorHandler */
+                $errorHandler = Instance::ensure('errorHandler', ErrorHandler::class);
+                $errorHandler->logException($httpException);
+            } catch (InvalidConfigException $e) {
+                Yii::debug($e->getMessage(), __METHOD__);
+            }
+            return [$this->message, []];
+        }
 
-        // TODO: use yii2-httpclient
-        $response = Json::decode(file_get_contents($request));
-
-        if (isset($response['success'])) {
+        if (ArrayHelper::getValue($response, 'success', false)) {
             return null;
         }
+
+        Yii::debug(ArrayHelper::getValue($response, 'error-codes'), __METHOD__);
 
         return [$this->message, []];
     }
