@@ -50,7 +50,8 @@ use alexeevdv\recaptcha\RecaptchaValidator;
 use alexeevdv\recaptcha\RecaptchaWidget;
 
 // Model validation rules
-public function rules() {
+public function rules()
+{
     return [
         //...
         ['recaptcha', RecaptchaValidator::class, 'secret' => 'YOUR_SECRET'],
