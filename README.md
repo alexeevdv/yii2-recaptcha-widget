@@ -18,13 +18,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```bash
-$ php composer.phar require alexeevdv/yii2-recaptcha-widget "~1.1.1"
+$ php composer.phar require alexeevdv/yii2-recaptcha-widget "~1.1.0"
 ```
 
 or add
 
 ```
-"alexeevdv/yii2-recaptcha-widget": "~1.1.1"
+"alexeevdv/yii2-recaptcha-widget": "~1.1.0"
 ```
 
 to the ```require``` section of your `composer.json` file.
@@ -75,30 +75,6 @@ echo $form->field($model, 'recaptcha')->widget(RecaptchaWidget::class);
 // As standalone field
 echo RecaptchaWidget::widget();
 
-```
-
-## Model-less Usage
-
-```php
-use alexeevdv\recaptcha\RecaptchaWidget;
-
-// Using ActiveForm
-echo  RecaptchaWidget::widget([ "name" => 'recaptcha', ]);
-
-// The submit button
-echo Html::submitButton('SUBMIT', ['id' => 'do-submit'])
-
-```
-Now on Jquery
-```javascript
-    $("form").submit(function(event) {
-        var recaptcha = $("#g-recaptcha-response").val();
-        if (recaptcha === "") {
-            event.preventDefault();
-            alert("Please use reCaptcha!, Show us that you are not a robot!");
-            //swal("reCaptcha!", "Show us that you are not a robot!");  //or swal if you like
-        }
-    });
 ```
 
 ## Additional component and widget params
