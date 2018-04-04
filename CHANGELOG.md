@@ -1,3 +1,3 @@
-1.2.0
+1.1.2
 =====
-- `language` param is added for RecaptchaWidget.
+- Yii::trace() instead of Yii::debug() for backward compatibility
