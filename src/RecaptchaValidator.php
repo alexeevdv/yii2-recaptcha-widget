@@ -101,7 +101,7 @@ class RecaptchaValidator extends Validator
                 $errorHandler = Instance::ensure('errorHandler', ErrorHandler::class);
                 $errorHandler->logException($httpException);
             } catch (InvalidConfigException $e) {
-                Yii::debug($e->getMessage(), __METHOD__);
+                Yii::trace($e->getMessage(), __METHOD__);
             }
             return [$this->message, []];
         }
@@ -110,7 +110,7 @@ class RecaptchaValidator extends Validator
             return null;
         }
 
-        Yii::debug(ArrayHelper::getValue($response, 'error-codes'), __METHOD__);
+        Yii::trace(ArrayHelper::getValue($response, 'error-codes'), __METHOD__);
 
         return [$this->message, []];
     }
