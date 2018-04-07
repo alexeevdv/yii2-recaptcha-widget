@@ -68,14 +68,19 @@ echo RecaptchaWidget::widget([
 ## Usage
 
 ```php
+use alexeevdv\recaptcha\RecaptchaValidator;
 use alexeevdv\recaptcha\RecaptchaWidget;
 
 // Using ActiveForm
+// In this case model validation rules will be applied
+// You'll need to specify RecaptchaValidator for attribute
 echo $form->field($model, 'recaptcha')->widget(RecaptchaWidget::class);
 
 // As standalone field
-echo RecaptchaWidget::widget();
-
+echo RecaptchaWidget::widget(['name' => 'recaptcha']);
+// In this case you need to check value manually
+$validator = new RecaptchaValidator();
+$isValid = $validator->validateValue(Yii::$app->request->get('recaptcha'));
 ```
 
 ## Additional component and widget params
