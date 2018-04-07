@@ -6,8 +6,8 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\web\View;
+use yii\helpers\Json;
+use yii\web\JsExpression;
 use yii\widgets\InputWidget;
 
 /**
@@ -53,18 +53,26 @@ class RecaptchaWidget extends InputWidget
     public $tabindex;
 
     /**
-     * Optional. The name of your callback function to be executed when the user submits a successful CAPTCHA response.
-     * The user's response, g-recaptcha-response, will be the input for your callback function.
+     * Optional. The name of your callback function, executed when the user submits a successful response.
+     * The g-recaptcha-response token is passed to your callback.
      * @var string
      */
     public $callback;
 
     /**
-     * Optional. The name of your callback function to be executed when the recaptcha
-     * response expires and the user needs to solve a new CAPTCHA.
-     * @var string
+     * Optional. The name of your callback function, executed when the reCAPTCHA response
+     * expires and the user needs to re-verify.
+     * @var string|JsExpression
      */
     public $expiredCallback;
+
+    /**
+     * Optional. The name of your callback function, executed when reCAPTCHA encounters
+     * an error (usually network connectivity) and cannot continue until connectivity is restored.
+     * If you specify a function here, you are responsible for informing the user that they should retry.
+     * @var string|JsExpression
+     */
+    public $errorCallback;
 
     /**
      * Recaptcha component
@@ -90,6 +98,11 @@ class RecaptchaWidget extends InputWidget
     public $container = 'div';
 
     /**
+     * @var array
+     */
+    public $containerOptions = [];
+
+    /**
      * @inheritdoc
      * @throws InvalidConfigException
      */
@@ -106,6 +119,7 @@ class RecaptchaWidget extends InputWidget
                     'tabindex' => $component->tabindex,
                     'callback' => $component->callback,
                     'expiredCallback' => $component->expiredCallback,
+                    'errorCallback' => $component->errorCallback,
                 ]),
                 array_filter([
                     'siteKey' => $this->siteKey,
@@ -115,6 +129,7 @@ class RecaptchaWidget extends InputWidget
                     'tabindex' => $this->tabindex,
                     'callback' => $this->callback,
                     'expiredCallback' => $this->expiredCallback,
+                    'errorCallback' => $this->errorCallback,
                 ])
             ));
         } catch (InvalidConfigException $e) {
@@ -177,33 +192,45 @@ class RecaptchaWidget extends InputWidget
      */
     public function run()
     {
-        $url = $this->apiJs;
-
-        if ($this->language !== false) {
-            $url .= '?hl=' . $this->language;
-        }
-
-        $this->view->registerJsFile($url, [
-            'position' => View::POS_HEAD,
-            'async' => true,
-            'defer' => true
-        ]);
+        $id = $this->getId();
 
         $options = [
-            'class' => 'g-recaptcha',
-            'data-sitekey' => $this->siteKey,
+            'sitekey' => $this->siteKey,
+            'theme' => $this->theme,
+            'type' => $this->type,
+            'size' => $this->size,
+            'tabindex' => $this->tabindex,
+            'callback' => new JsExpression('function (response) {
+                document.getElementById("' . $id . '-input").value = response;                
+                var userCallback = ' . Json::encode($this->callback). ';
+                if (userCallback) {
+                    userCallback.call(this, response);
+                }
+            }'),
+            'expired-callback' => new JsExpression('function () {
+                var userCallback = ' . Json::encode($this->expiredCallback). ';
+                if (userCallback) {
+                    userCallback.call(this);
+                }
+            }'),
+            'error-callback' => new JsExpression('function () {
+                var userCallback = ' . Json::encode($this->errorCallback). ';
+                if (userCallback) {
+                    userCallback.call(this);
+                }
+            }'),
         ];
 
-        foreach (['theme', 'type', 'size', 'tabindex', 'callback'] as $param) {
-            $options['data-' . $param] = $this->$param;
-        }
-
-        if ($this->expiredCallback !== null) {
-            $options['data-expired-callback'] = $this->expiredCallback;
-        }
-
-        $options = ArrayHelper::merge($options, $this->options);
-
-        return Html::tag($this->container, '', $options);
+        return $this->render('recaptcha', [
+            'id' => $id,
+            'model' => $this->model,
+            'attribute' => $this->attribute,
+            'name' => $this->name,
+            'container' => $this->container,
+            'containerOptions' => $this->containerOptions,
+            'options' => ArrayHelper::merge($options, $this->options),
+            'apiJs' => $this->apiJs,
+            'language' => $this->language,
+        ]);
     }
 }

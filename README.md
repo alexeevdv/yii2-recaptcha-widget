@@ -107,18 +107,26 @@ public $size;
 public $tabindex;
 
 /**
- * Optional. The name of your callback function to be executed when the user submits a successful CAPTCHA response.
- * The user's response, g-recaptcha-response, will be the input for your callback function.
- * @var string
+ * Optional. The name of your callback function, executed when the user submits a successful response.
+ * The g-recaptcha-response token is passed to your callback.
+ * @var string|JsExpression
  */
 public $callback;
 
 /**
- * Optional. The name of your callback function to be executed when the recaptcha
- * response expires and the user needs to solve a new CAPTCHA.
- * @var string
+ * Optional. The name of your callback function, executed when the reCAPTCHA response expires
+ * and the user needs to re-verify.
+ * @var string|JsExpression
  */
 public $expiredCallback;
+
+/**
+ * Optional. The name of your callback function, executed when reCAPTCHA encounters an error 
+ * (usually network connectivity) and cannot continue until connectivity is restored. If you specify 
+ * a function here, you are responsible for informing the user that they should retry.
+ * @var string|JsExpression
+ */
+public $errorCallback;
 
 /**
  * Optional. Forces the widget to render in a specific language

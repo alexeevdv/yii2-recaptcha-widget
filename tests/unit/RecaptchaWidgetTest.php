@@ -6,8 +6,11 @@ use alexeevdv\recaptcha\Recaptcha;
 use alexeevdv\recaptcha\RecaptchaWidget;
 use Codeception\Stub;
 use Yii;
+use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\web\Application;
+use yii\web\AssetManager;
+use yii\web\Request;
 use yii\web\View;
 
 /**
@@ -29,11 +32,15 @@ class RecaptchaWidgetTest extends \Codeception\Test\Unit
         Yii::$app = Stub::make(Application::class, [
             'getView' => Stub::make(View::class),
             'language' => 'en-GB',
+            'getAssetManager' => Stub::make(AssetManager::class),
+            'getI18n' => function () {
+                return Yii::$container->get('i18n');
+            },
         ]);
         Yii::$container->set('i18n', [
             'class' => \yii\i18n\I18N::class,
             'translations' => [
-                'app' => [
+                '*' => [
                     'class' => 'yii\i18n\PhpMessageSource',
                     'sourceLanguage' => 'en-US',
                     'basePath' => '@yii/messages',
@@ -42,6 +49,11 @@ class RecaptchaWidgetTest extends \Codeception\Test\Unit
         ]);
         Yii::$container->set('recaptcha', function () {
             return Stub::make(Recaptcha::class);
+        });
+        Yii::$container->set('request', function () {
+            return Stub::make(Request::class, [
+                'getIsPjax' => true,
+            ]);
         });
     }
 
@@ -53,6 +65,7 @@ class RecaptchaWidgetTest extends \Codeception\Test\Unit
         Yii::$app = null;
         Yii::$container->clear('i18n');
         Yii::$container->clear('recaptcha');
+        Yii::$container->clear('request');
     }
 
     /**
@@ -238,7 +251,7 @@ class RecaptchaWidgetTest extends \Codeception\Test\Unit
             'expiredCallback' => 'myCallback',
         ]);
         $html = $widget->run();
-        $this->tester->assertStringStartsWith('<div', $html);
+        $this->tester->assertStringStartsWith('<input', $html);
 
         Yii::$app->language = 'en';
         $widget = new RecaptchaWidget([
@@ -246,15 +259,17 @@ class RecaptchaWidgetTest extends \Codeception\Test\Unit
             'siteKey' => 'hurrdurr',
         ]);
         $widget->run();
-        $this->tester->assertStringStartsWith('<div', $html);
+        $this->tester->assertStringStartsWith('<input', $html);
 
+        $model = new DynamicModel(['recaptcha' => null]);
         Yii::$app->language = 'ru-RU';
         $widget = new RecaptchaWidget([
-            'name' => 'input',
+            'model' => $model,
+            'attribute' => 'recaptcha',
             'siteKey' => 'hurrdurr',
         ]);
         $widget->run();
-        $this->tester->assertStringStartsWith('<div', $html);
+        $this->tester->assertStringStartsWith('<input', $html);
 
         Yii::$container->clear('recaptcha');
         $widget = new RecaptchaWidget([
@@ -262,6 +277,6 @@ class RecaptchaWidgetTest extends \Codeception\Test\Unit
             'siteKey' => 'hurrdurr',
         ]);
         $widget->run();
-        $this->tester->assertStringStartsWith('<div', $html);
+        $this->tester->assertStringStartsWith('<input', $html);
     }
 }

@@ -70,20 +70,12 @@ class RecaptchaValidator extends Validator
      */
     protected function validateValue($value)
     {
-        /** @var Request $request */
-        $request = Instance::ensure('request', Request::class);
-        if (empty($value)) {
-            if ($request->getIsPost()) {
-                $value = $request->post('g-recaptcha-response');
-            } elseif ($request->getIsGet()) {
-                $value = $request->get('g-recaptcha-response');
-            }
-
-            if (!$value) {
-                return [$this->message, []];
-            }
+        if (!$value) {
+            return [$this->message, []];
         }
 
+        /** @var Request $request */
+        $request = Instance::ensure('request', Request::class);
         /** @var HttpClient $httpClient */
         $httpClient = Instance::ensure($this->apiClient, HttpClient::class);
         try {
