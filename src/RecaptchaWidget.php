@@ -202,19 +202,19 @@ class RecaptchaWidget extends InputWidget
             'tabindex' => $this->tabindex,
             'callback' => new JsExpression('function (response) {
                 document.getElementById("' . $id . '-input").value = response;                
-                var userCallback = ' . Json::encode($this->callback). ';
+                var userCallback = ' . Json::encode($this->callback) . ';
                 if (userCallback) {
                     userCallback.call(this, response);
                 }
             }'),
             'expired-callback' => new JsExpression('function () {
-                var userCallback = ' . Json::encode($this->expiredCallback). ';
+                var userCallback = ' . Json::encode($this->expiredCallback) . ';
                 if (userCallback) {
                     userCallback.call(this);
                 }
             }'),
             'error-callback' => new JsExpression('function () {
-                var userCallback = ' . Json::encode($this->errorCallback). ';
+                var userCallback = ' . Json::encode($this->errorCallback) . ';
                 if (userCallback) {
                     userCallback.call(this);
                 }

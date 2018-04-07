@@ -58,4 +58,3 @@ $request = Instance::ensure('request', Request::class);
 if ($request->isPjax) {
     $this->registerJs($jsCallbackName . '();', View::POS_END);
 }
-
