@@ -83,6 +83,18 @@ $validator = new RecaptchaValidator();
 $isValid = $validator->validateValue(Yii::$app->request->get('recaptcha'));
 ```
 
+## Usage in tests
+
+To turn off recaptcha checking you need to add this in your test config:
+```
+'container' => [
+    'definitions' => [
+        \alexeevdv\recaptcha\RecaptchaValidator::class => ['skipOnEmpty' => true],
+    ],
+],
+```
+
+
 ## Additional component and widget params
 
 ```php
