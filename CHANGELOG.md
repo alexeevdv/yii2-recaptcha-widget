@@ -1,3 +1,7 @@
+1.1.4
+=====
+- RU and ET locales
+
 1.1.3
 =====
 - Explicit recaptcha rendering (for Pjax support and multiple widgets per page)
