@@ -31,7 +31,18 @@ class RecaptchaValidator extends Validator
     public $component = 'recaptcha';
 
     /**
-     * @var array|string|HttpClient
+     * Minimal score (v3)
+     * @var float
+     */
+    public $minimalScore;
+
+    /**
+     * @var Request|array|string
+     */
+    public $request = 'request';
+
+    /**
+     * @var HttpClient|array|string
      */
     public $apiClient = [
         'class' => HttpClient::class,
@@ -43,6 +54,11 @@ class RecaptchaValidator extends Validator
      * @var string
      */
     public $secret;
+
+    /**
+     * @var callable
+     */
+    public $onScoreReceived;
 
     /**
      * @inheritdoc
@@ -75,7 +91,7 @@ class RecaptchaValidator extends Validator
         }
 
         /** @var Request $request */
-        $request = Instance::ensure('request', Request::class);
+        $request = Instance::ensure($this->request, Request::class);
         /** @var HttpClient $httpClient */
         $httpClient = Instance::ensure($this->apiClient, HttpClient::class);
         try {
@@ -96,6 +112,16 @@ class RecaptchaValidator extends Validator
                 Yii::trace($e->getMessage(), __METHOD__);
             }
             return [$this->message, []];
+        }
+
+        if ($this->minimalScore !== null) {
+            $score = ArrayHelper::getValue($response, 'score', 0);
+            if (is_callable($this->onScoreReceived)) {
+                call_user_func($this->onScoreReceived, $score);
+            }
+            if ($score < $this->minimalScore) {
+                return [$this->message, []];
+            }
         }
 
         if (ArrayHelper::getValue($response, 'success', false)) {

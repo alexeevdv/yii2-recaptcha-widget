@@ -7,6 +7,7 @@ yii2-recaptcha-widget
 ![PHP 7.0](https://img.shields.io/badge/PHP-7.0-green.svg) 
 ![PHP 7.1](https://img.shields.io/badge/PHP-7.1-green.svg) 
 ![PHP 7.2](https://img.shields.io/badge/PHP-7.2-green.svg)
+![PHP 7.3](https://img.shields.io/badge/PHP-7.3-green.svg)
 
 
 Yii2 wrapper for Google [reCAPTCHA](https://www.google.com/recaptcha).
@@ -54,7 +55,7 @@ public function rules()
 {
     return [
         //...
-        ['recaptcha', RecaptchaValidator::class, 'secret' => 'YOUR_SECRET'],
+        ['recaptcha', RecaptchaValidator::class, 'secret' => 'YOUR_SECRET', 'minimalScore' => 0.6],
         //...
     ];
 }
