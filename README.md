@@ -55,7 +55,15 @@ public function rules()
 {
     return [
         //...
-        ['recaptcha', RecaptchaValidator::class, 'secret' => 'YOUR_SECRET', 'minimalScore' => 0.6],
+        [
+            ['recaptcha'], 
+            RecaptchaValidator::class, 
+            'secret' => 'YOUR_SECRET', 
+            'minimalScore' => 0.6, 
+            'onScoreReceived' => function ($score) {
+                // Do smth on actual user score. F.e. log it somewhere
+            },
+        ],
         //...
     ];
 }
