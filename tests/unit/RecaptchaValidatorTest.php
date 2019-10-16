@@ -181,4 +181,29 @@ class RecaptchaValidatorTest extends \Codeception\Test\Unit
         $validator = new RecaptchaValidator(['secret' => 'Hurrdurr']);
         $this->tester->assertFalse($validator->validate('recaptcha-response'));
     }
+
+    public function testValidateWithMinimalScore()
+    {
+        Yii::$container->clear(HttpClientResponse::class);
+        Yii::$container->set(HttpClientResponse::class, function () {
+            return Stub::make(HttpClientResponse::class, [
+                'getData' => [
+                    'success' => true,
+                    'score' => 0.5,
+                ],
+            ]);
+        });
+
+        $receivedScore = false;
+
+        $validator = new RecaptchaValidator([
+            'secret' => 'Hurrdurr',
+            'minimalScore' => 0.6,
+            'onScoreReceived' => function ($score) use (&$receivedScore) {
+                $receivedScore = $score;
+            }
+        ]);
+        $this->tester->assertFalse($validator->validate('recaptcha-response'));
+        $this->tester->assertEquals(0.5, $receivedScore);
+    }
 }
