@@ -1,5 +1,8 @@
 Under development
 -----------------
+
+1.2.0 (2019-10-16)
+-----------------
 - Minimal score validation
 
 1.1.4
