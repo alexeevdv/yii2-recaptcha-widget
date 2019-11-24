@@ -23,7 +23,7 @@ use yii\web\View;
 if ($model) {
     echo Html::activeHiddenInput($model, $attribute, ['id' => $id . '-input']);
 } else {
-    echo Html::hiddenInput($name);
+    echo Html::hiddenInput($name, null, ['id' => $id . '-input']);
 }
 
 echo Html::tag($container, '', ArrayHelper::merge($containerOptions, ['id' => $id . '-container']));
