@@ -1,6 +1,10 @@
 Under development
 -----------------
 
+1.2.1 (2019-11-24)
+-----------------
+- Bug: `Uncaught (in promise) null` when reCapcha widget used without model (jaddek)
+
 1.2.0 (2019-10-16)
 -----------------
 - Minimal score validation
